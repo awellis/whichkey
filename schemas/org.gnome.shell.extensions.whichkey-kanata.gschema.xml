@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="whichkey-kanata">
+  <schema id="org.gnome.shell.extensions.whichkey-kanata"
+          path="/org/gnome/shell/extensions/whichkey-kanata/">
+    <key name="kanata-port" type="i">
+      <default>9615</default>
+      <summary>Kanata TCP port</summary>
+      <description>Port number for kanata's TCP server</description>
+    </key>
+  </schema>
+</schemalist>

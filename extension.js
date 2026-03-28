@@ -8,11 +8,26 @@ export default class WhichKeyExtension extends Extension {
     enable() {
         console.log('[WhichKey] enabled');
 
+        this._settings = this.getSettings();
         this._overlay = new WhichKeyOverlay();
         this._indicator = new PanelIndicator();
         this._breadcrumbTrail = [];
 
-        this._client = new KanataClient('127.0.0.1', 9615);
+        this._connectClient(this._settings.get_int('kanata-port'));
+
+        this._settingsChangedId = this._settings.connect(
+            'changed::kanata-port',
+            () => {
+                const port = this._settings.get_int('kanata-port');
+                console.log(`[WhichKey] port changed to ${port}`);
+                this._client?.disconnect();
+                this._connectClient(port);
+            }
+        );
+    }
+
+    _connectClient(port) {
+        this._client = new KanataClient('127.0.0.1', port);
 
         this._client.onLayerChange((layerName) => {
             console.log(`[WhichKey] layer: ${layerName}`);
@@ -33,7 +48,6 @@ export default class WhichKeyExtension extends Extension {
                     this._breadcrumbTrail
                 );
             } else {
-                // Unknown layer — treat as hidden
                 this._breadcrumbTrail = [];
                 this._overlay.hide();
             }
@@ -52,6 +66,11 @@ export default class WhichKeyExtension extends Extension {
     disable() {
         console.log('[WhichKey] disabled');
 
+        if (this._settingsChangedId) {
+            this._settings.disconnect(this._settingsChangedId);
+            this._settingsChangedId = null;
+        }
+
         this._client?.disconnect();
         this._client = null;
 
@@ -61,6 +80,7 @@ export default class WhichKeyExtension extends Extension {
         this._indicator?.destroy();
         this._indicator = null;
 
+        this._settings = null;
         this._breadcrumbTrail = null;
     }
 }
