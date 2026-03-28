@@ -1,0 +1,58 @@
+.whichkey-overlay {
+    background-color: rgba(30, 30, 46, 0.92);
+    border-radius: 12px;
+    padding: 16px 20px;
+    border: 1px solid rgba(137, 180, 250, 0.3);
+}
+
+.whichkey-breadcrumb {
+    font-size: 11px;
+    font-weight: bold;
+    color: rgba(205, 214, 244, 0.5);
+    margin-bottom: 10px;
+    font-family: monospace;
+}
+
+.whichkey-group-label {
+    font-size: 10px;
+    font-weight: bold;
+    color: rgba(205, 214, 244, 0.35);
+    margin-top: 6px;
+    margin-bottom: 2px;
+    font-family: monospace;
+}
+
+.whichkey-binding {
+    spacing: 4px;
+    margin-right: 16px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+.whichkey-key {
+    background-color: rgba(137, 180, 250, 0.2);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-family: monospace;
+    font-size: 14px;
+    font-weight: bold;
+    color: rgb(137, 180, 250);
+    min-width: 20px;
+    text-align: center;
+}
+
+.whichkey-action {
+    color: rgb(205, 214, 244);
+    font-family: monospace;
+    font-size: 13px;
+}
+
+.whichkey-prefix .whichkey-key {
+    color: rgb(249, 226, 175);
+    background-color: rgba(249, 226, 175, 0.15);
+}
+
+.whichkey-prefix .whichkey-action {
+    color: rgb(249, 226, 175);
+    font-style: italic;
+}
