@@ -1,6 +1,7 @@
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 import { WhichKeyOverlay } from './overlay.js';
 import { KanataClient } from './kanataClient.js';
+import { PanelIndicator } from './panelIndicator.js';
 import { LAYER_BINDINGS, HIDDEN_LAYERS } from './keymap.js';
 
 export default class WhichKeyExtension extends Extension {
@@ -8,12 +9,14 @@ export default class WhichKeyExtension extends Extension {
         console.log('[WhichKey] enabled');
 
         this._overlay = new WhichKeyOverlay();
+        this._indicator = new PanelIndicator();
         this._breadcrumbTrail = [];
 
         this._client = new KanataClient('127.0.0.1', 9615);
 
         this._client.onLayerChange((layerName) => {
             console.log(`[WhichKey] layer: ${layerName}`);
+            this._indicator.setLayer(layerName);
 
             if (HIDDEN_LAYERS.has(layerName)) {
                 this._breadcrumbTrail = [];
@@ -38,6 +41,7 @@ export default class WhichKeyExtension extends Extension {
 
         this._client.onConnectionChange((connected) => {
             console.log(`[WhichKey] connected: ${connected}`);
+            this._indicator.setConnected(connected);
             if (!connected)
                 this._overlay.hide();
         });
@@ -53,6 +57,9 @@ export default class WhichKeyExtension extends Extension {
 
         this._overlay?.destroy();
         this._overlay = null;
+
+        this._indicator?.destroy();
+        this._indicator = null;
 
         this._breadcrumbTrail = null;
     }

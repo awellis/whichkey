@@ -56,3 +56,22 @@
     color: rgb(249, 226, 175);
     font-style: italic;
 }
+
+.whichkey-indicator {
+    font-family: monospace;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.whichkey-indicator-base {
+    color: rgba(205, 214, 244, 0.5);
+}
+
+.whichkey-indicator-active {
+    color: rgb(137, 180, 250);
+}
+
+.whichkey-indicator-disconnected {
+    color: rgba(205, 214, 244, 0.3);
+    text-decoration: line-through;
+}
