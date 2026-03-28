@@ -1,0 +1,8 @@
+{
+  "name": "WhichKey for Kanata",
+  "description": "Neovim-style which-key OSD overlay for kanata keyboard layers",
+  "uuid": "whichkey-kanata@local",
+  "shell-version": ["49"],
+  "settings-schema": "org.gnome.shell.extensions.whichkey-kanata",
+  "version": 1
+}
