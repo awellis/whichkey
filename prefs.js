@@ -3,14 +3,16 @@ import Gtk from 'gi://Gtk';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+import { buildLayerBindings, resolveConfigPath } from './kanataParser.js';
 
 export default class WhichKeyPreferences extends ExtensionPreferences {
     fillPreferencesWindow(window) {
         const settings = this.getSettings();
 
-        const page = new Adw.PreferencesPage({
-            title: 'WhichKey for Kanata',
-            icon_name: 'input-keyboard-symbolic',
+        // --- Settings page ---
+        const settingsPage = new Adw.PreferencesPage({
+            title: 'Settings',
+            icon_name: 'preferences-system-symbolic',
         });
 
         // --- Kanata group ---
@@ -44,6 +46,26 @@ export default class WhichKeyPreferences extends ExtensionPreferences {
         restartRow.add_suffix(restartButton);
         restartRow.set_activatable_widget(restartButton);
         kanataGroup.add(restartRow);
+
+        // Edit config button
+        const resolvedPath = resolveConfigPath(settings);
+        const editRow = new Adw.ActionRow({
+            title: 'Edit Config',
+            subtitle: resolvedPath,
+        });
+        const editButton = new Gtk.Button({
+            icon_name: 'text-editor-symbolic',
+            valign: Gtk.Align.CENTER,
+            tooltip_text: 'Open config in text editor',
+        });
+        editButton.connect('clicked', () => {
+            const file = Gio.File.new_for_path(resolveConfigPath(settings));
+            const launcher = new Gtk.FileLauncher({ file });
+            launcher.launch(window, null, null);
+        });
+        editRow.add_suffix(editButton);
+        editRow.set_activatable_widget(editButton);
+        kanataGroup.add(editRow);
 
         // --- Advanced (collapsed) ---
         const advancedRow = new Adw.ExpanderRow({
@@ -103,6 +125,7 @@ export default class WhichKeyPreferences extends ExtensionPreferences {
                         const path = file.get_path();
                         settings.set_string('kanata-config-path', path);
                         configRow.set_subtitle(path);
+                        editRow.set_subtitle(path);
                     }
                 } catch (e) {
                     // User cancelled
@@ -115,7 +138,7 @@ export default class WhichKeyPreferences extends ExtensionPreferences {
 
         kanataGroup.add(advancedRow);
 
-        page.add(kanataGroup);
+        settingsPage.add(kanataGroup);
 
         // --- Appearance group ---
         const appearanceGroup = new Adw.PreferencesGroup({
@@ -179,7 +202,123 @@ export default class WhichKeyPreferences extends ExtensionPreferences {
         });
         appearanceGroup.add(positionRow);
 
-        page.add(appearanceGroup);
-        window.add(page);
+        settingsPage.add(appearanceGroup);
+        window.add(settingsPage);
+
+        // --- Layers page ---
+        const layersPage = new Adw.PreferencesPage({
+            title: 'Layers',
+            icon_name: 'view-list-symbolic',
+        });
+
+        this._populateLayersPage(layersPage, settings, window);
+        window.add(layersPage);
+    }
+
+    _populateLayersPage(page, settings, window) {
+        // Remove existing groups
+        let child = page.get_first_child();
+        while (child) {
+            const next = child.get_next_sibling();
+            // PreferencesPage wraps children in a scrolled/clamp structure;
+            // removing all groups via the page API is cleaner
+            if (child instanceof Adw.PreferencesGroup)
+                page.remove(child);
+            child = next;
+        }
+
+        const configPath = resolveConfigPath(settings);
+
+        // Controls group with refresh button
+        const controlsGroup = new Adw.PreferencesGroup();
+        const refreshRow = new Adw.ActionRow({
+            title: 'Config File',
+            subtitle: configPath,
+        });
+        const refreshButton = new Gtk.Button({
+            icon_name: 'view-refresh-symbolic',
+            valign: Gtk.Align.CENTER,
+            tooltip_text: 'Refresh layer view',
+        });
+        refreshButton.connect('clicked', () => {
+            // Clear and repopulate
+            const groups = [];
+            let child = page.get_first_child();
+            while (child) {
+                const next = child.get_next_sibling();
+                if (child instanceof Adw.PreferencesGroup)
+                    groups.push(child);
+                child = next;
+            }
+            for (const g of groups)
+                page.remove(g);
+            this._populateLayersPage(page, settings, window);
+        });
+        refreshRow.add_suffix(refreshButton);
+        controlsGroup.add(refreshRow);
+        page.add(controlsGroup);
+
+        // Parse and display layers
+        try {
+            const [ok, contents] = GLib.file_get_contents(configPath);
+            if (!ok) throw new Error('Could not read config file');
+
+            const text = new TextDecoder().decode(contents);
+            const { layerBindings, hiddenLayers } = buildLayerBindings(text);
+
+            const layerNames = [...Object.keys(layerBindings), ...hiddenLayers];
+            // Deduplicate (base might be in both)
+            const seen = new Set();
+            for (const name of layerNames) {
+                if (seen.has(name)) continue;
+                seen.add(name);
+
+                const bindings = layerBindings[name];
+                const isHidden = hiddenLayers.has(name);
+
+                const group = new Adw.PreferencesGroup({
+                    title: name.toUpperCase(),
+                    description: isHidden ? 'Hidden layer — not shown in overlay' : null,
+                });
+
+                if (bindings && bindings.length > 0) {
+                    for (const b of bindings) {
+                        const row = new Adw.ActionRow({
+                            title: `${b.key}  →  ${b.action}`,
+                            subtitle: b.group + (b.isPrefix ? ' (prefix)' : ''),
+                        });
+                        if (b.isPrefix) {
+                            row.add_suffix(new Gtk.Image({
+                                icon_name: 'go-next-symbolic',
+                                valign: Gtk.Align.CENTER,
+                            }));
+                        }
+                        group.add(row);
+                    }
+                } else if (!isHidden) {
+                    const emptyRow = new Adw.ActionRow({
+                        title: 'No visible bindings',
+                        subtitle: 'All keys are transparent or modifier-only',
+                    });
+                    group.add(emptyRow);
+                }
+
+                page.add(group);
+            }
+
+            if (seen.size === 0) {
+                const emptyGroup = new Adw.PreferencesGroup({
+                    title: 'No Layers Found',
+                    description: 'Could not parse any layers from the config file',
+                });
+                page.add(emptyGroup);
+            }
+        } catch (e) {
+            const errorGroup = new Adw.PreferencesGroup({
+                title: 'Error',
+                description: `Could not load config: ${e.message}`,
+            });
+            page.add(errorGroup);
+        }
     }
 }

@@ -4,7 +4,7 @@ import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 import { WhichKeyOverlay } from './overlay.js';
 import { KanataClient } from './kanataClient.js';
 import { PanelIndicator } from './panelIndicator.js';
-import { buildLayerBindings } from './kanataParser.js';
+import { buildLayerBindings, resolveConfigPath } from './kanataParser.js';
 import { LAYER_BINDINGS, HIDDEN_LAYERS } from './keymap.js';
 
 export default class WhichKeyExtension extends Extension {
@@ -50,12 +50,7 @@ export default class WhichKeyExtension extends Extension {
     }
 
     _loadKeymap() {
-        let configPath = this._settings.get_string('kanata-config-path');
-        if (!configPath) {
-            configPath = GLib.build_filenamev([
-                GLib.get_home_dir(), '.config', 'kanata', 'kanata.kbd',
-            ]);
-        }
+        const configPath = resolveConfigPath(this._settings);
 
         try {
             const [ok, contents] = GLib.file_get_contents(configPath);
@@ -77,12 +72,7 @@ export default class WhichKeyExtension extends Extension {
     _setupFileMonitor() {
         this._clearFileMonitor();
 
-        let configPath = this._settings.get_string('kanata-config-path');
-        if (!configPath) {
-            configPath = GLib.build_filenamev([
-                GLib.get_home_dir(), '.config', 'kanata', 'kanata.kbd',
-            ]);
-        }
+        const configPath = resolveConfigPath(this._settings);
 
         try {
             const file = Gio.File.new_for_path(configPath);

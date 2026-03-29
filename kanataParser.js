@@ -1,4 +1,12 @@
+import GLib from 'gi://GLib';
 import { labelForKey, inferGroup } from './actionLabels.js';
+
+// Resolve the kanata config path from settings, falling back to the default location
+export function resolveConfigPath(settings) {
+    const path = settings.get_string('kanata-config-path');
+    if (path) return path;
+    return GLib.build_filenamev([GLib.get_home_dir(), '.config', 'kanata', 'kanata.kbd']);
+}
 
 // Tokenize kanata config text into flat token array
 function tokenize(text) {

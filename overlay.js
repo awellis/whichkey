@@ -28,7 +28,10 @@ export class WhichKeyOverlay {
         this._grid = new St.BoxLayout({ vertical: true });
         this._overlay.add_child(this._grid);
 
-        Main.layoutManager.uiGroup.add_child(this._overlay);
+        Main.layoutManager.addChrome(this._overlay, {
+            affectsInputRegion: false,
+            affectsStruts: false,
+        });
 
         this._monitorsChangedId = Main.layoutManager.connect(
             'monitors-changed',
@@ -172,6 +175,7 @@ export class WhichKeyOverlay {
             Main.layoutManager.disconnect(this._monitorsChangedId);
             this._monitorsChangedId = null;
         }
+        Main.layoutManager.removeChrome(this._overlay);
         this._overlay.destroy();
         this._overlay = null;
     }
