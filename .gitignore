@@ -1,3 +1,5 @@
 schemas/gschemas.compiled
 *.swp
 *~
+
+/docs/
