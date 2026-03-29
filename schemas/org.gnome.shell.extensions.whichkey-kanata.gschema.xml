@@ -7,5 +7,30 @@
       <summary>Kanata TCP port</summary>
       <description>Port number for kanata's TCP server</description>
     </key>
+    <key name="kanata-config-path" type="s">
+      <default>''</default>
+      <summary>Kanata config file path</summary>
+      <description>Path to kanata .kbd config file. Empty uses ~/.config/kanata/kanata.kbd</description>
+    </key>
+    <key name="font-size" type="i">
+      <default>14</default>
+      <summary>Overlay font size</summary>
+      <description>Base font size in pixels for overlay key labels</description>
+    </key>
+    <key name="overlay-opacity" type="i">
+      <default>92</default>
+      <summary>Overlay opacity</summary>
+      <description>Background opacity as percentage (0-100)</description>
+    </key>
+    <key name="bottom-margin" type="i">
+      <default>48</default>
+      <summary>Bottom margin</summary>
+      <description>Distance from screen edge in pixels</description>
+    </key>
+    <key name="overlay-position" type="s">
+      <default>'bottom-center'</default>
+      <summary>Overlay position</summary>
+      <description>Screen position: bottom-center, top-center, bottom-left, bottom-right, top-left, top-right</description>
+    </key>
   </schema>
 </schemalist>

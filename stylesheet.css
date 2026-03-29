@@ -1,12 +1,12 @@
 .whichkey-overlay {
-    background-color: rgba(30, 30, 46, 0.92);
+    /* background-color set at runtime via inline style for configurable opacity */
     border-radius: 12px;
     padding: 16px 20px;
     border: 1px solid rgba(137, 180, 250, 0.3);
 }
 
 .whichkey-breadcrumb {
-    font-size: 11px;
+    /* font-size set at runtime */
     font-weight: bold;
     color: rgba(205, 214, 244, 0.5);
     margin-bottom: 10px;
@@ -14,7 +14,7 @@
 }
 
 .whichkey-group-label {
-    font-size: 10px;
+    /* font-size set at runtime */
     font-weight: bold;
     color: rgba(205, 214, 244, 0.35);
     margin-top: 6px;
@@ -34,7 +34,7 @@
     border-radius: 4px;
     padding: 2px 8px;
     font-family: monospace;
-    font-size: 14px;
+    /* font-size set at runtime */
     font-weight: bold;
     color: rgb(137, 180, 250);
     min-width: 20px;
@@ -44,7 +44,7 @@
 .whichkey-action {
     color: rgb(205, 214, 244);
     font-family: monospace;
-    font-size: 13px;
+    /* font-size set at runtime */
 }
 
 .whichkey-prefix .whichkey-key {
