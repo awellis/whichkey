@@ -50,7 +50,7 @@ Entered from leader via `x`. Each action fires and returns to base.
 1. Clone the repo into your GNOME Shell extensions directory:
 
 ```bash
-git clone https://github.com/USERNAME/whichkey.git ~/.local/share/gnome-shell/extensions/whichkey-kanata@local
+git clone https://github.com/awellis/whichkey.git ~/.local/share/gnome-shell/extensions/whichkey-kanata@local
 ```
 
 2. Make sure kanata is running with the TCP server flag:
