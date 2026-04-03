@@ -28,7 +28,7 @@ export class WhichKeyOverlay {
         this._grid = new St.BoxLayout({ vertical: true });
         this._overlay.add_child(this._grid);
 
-        Main.layoutManager.addChrome(this._overlay, {
+        Main.layoutManager.addTopChrome(this._overlay, {
             affectsInputRegion: false,
             affectsStruts: false,
         });
